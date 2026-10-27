@@ -1,0 +1,27 @@
+name: Cross-platform compatibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install check dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Check installer, rubrics and report generation
+        run: python -m unittest discover -s tests -v
